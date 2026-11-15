@@ -32,10 +32,6 @@ const dateLabel = (value: string) =>
     year: "numeric",
   });
 
-const localToday = new Date(
-  Date.now() - new Date().getTimezoneOffset() * 60_000,
-).toISOString().slice(0, 10);
-
 const CATEGORIES = [
   "Food & dining", "Education", "Transport", "Essentials", "Shopping",
   "Entertainment", "Allowance", "Stipend", "Other",
@@ -90,6 +86,11 @@ export default function TransactionsPage() {
         .some((value) => value.toLocaleLowerCase().includes(term)),
     );
   }, [transactions, search]);
+
+  const availableCategories = useMemo(
+    () => Array.from(new Set([...CATEGORIES, ...transactions.map((item) => item.category)])).sort((a, b) => a.localeCompare(b)),
+    [transactions],
+  );
 
   const totals = useMemo(() => {
     return visibleTransactions.reduce(
@@ -261,8 +262,7 @@ export default function TransactionsPage() {
             <label className="filter-field">
               <select aria-label="Filter by category" value={category} onChange={(event) => setCategory(event.target.value)}>
                 <option value="">All categories</option>
-                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-                {category && !CATEGORIES.includes(category) && <option value={category}>{category}</option>}
+                {availableCategories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
           </div>
@@ -337,7 +337,7 @@ export default function TransactionsPage() {
                   {CATEGORIES.map((item) => <option key={item}>{item}</option>)}
                   {!CATEGORIES.includes(editing.category) && <option>{editing.category}</option>}
                 </select></label>
-                <label className="field">Date<input name="transaction_date" type="date" required defaultValue={editing.transaction_date} max={localToday} /></label>
+                <label className="field">Date<input name="transaction_date" type="date" required defaultValue={editing.transaction_date} /></label>
               </div>
               <label className="field">Note (optional)<input name="note" maxLength={500} defaultValue={editing.note ?? ""} placeholder="Add a short note" /></label>
               <button className="submit-button" disabled={saving}>
