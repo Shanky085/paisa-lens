@@ -154,7 +154,7 @@ export default function Dashboard() {
       <section className="main">
         <header className="topbar">
           <span>Workspace / <b>Overview</b></span>
-          <div><span className="demo">● {summary ? "API CONNECTED" : loading ? "CONNECTING" : "API OFFLINE"}</span><Bell size={18} /><span className="date">{monthLabel(period)}</span></div>
+          <div><span className="demo">● {error ? "API ISSUE" : summary ? "API CONNECTED" : "CONNECTING"}</span><Bell size={18} /><span className="date">{monthLabel(period)}</span></div>
         </header>
 
         <section className="welcome">
@@ -166,16 +166,16 @@ export default function Dashboard() {
         {error && <div className="alert"><CircleAlert size={17} /><span>{error}</span><button onClick={() => void refresh()}>Retry</button></div>}
 
         <div className="metrics">
-          <Metric title="Total income" value={loading && !summary ? "—" : money(summary?.income)} sub="Recorded income this month" icon={ArrowDownRight} />
-          <Metric title="Total expenses" value={loading && !summary ? "—" : money(summary?.expenses)} sub={`${summary?.transaction_count ?? 0} recorded transactions`} icon={ArrowUpRight} />
-          <Metric title="Net cash flow" value={loading && !summary ? "—" : money(summary?.net_cash_flow)} sub="Income minus expenses" icon={Activity} />
-          <Metric title="Budget remaining" value={!budgetConfigured ? "Not set" : money(summary?.budget_remaining)} sub={budgetConfigured ? `${summary?.budget_utilization ?? 0}% of budget used` : "Set a monthly limit"} icon={PiggyBank} />
+          <Metric title="Total income" value={summary ? money(summary.income) : "—"} sub={summary ? "Recorded income this month" : "Waiting for API data"} icon={ArrowDownRight} />
+          <Metric title="Total expenses" value={summary ? money(summary.expenses) : "—"} sub={summary ? `${summary.transaction_count} recorded transactions` : "Waiting for API data"} icon={ArrowUpRight} />
+          <Metric title="Net cash flow" value={summary ? money(summary.net_cash_flow) : "—"} sub={summary ? "Income minus expenses" : "Waiting for API data"} icon={Activity} />
+          <Metric title="Budget remaining" value={!summary ? "—" : !budgetConfigured ? "Not set" : money(summary.budget_remaining)} sub={budgetConfigured ? `${summary?.budget_utilization ?? 0}% of budget used` : summary ? "Set a monthly limit" : "Waiting for API data"} icon={PiggyBank} />
         </div>
 
         <div className="panels">
           <article className="glass panel">
             <div className="panel-head"><div><small>YOUR CASH FLOW</small><h2>Spending overview</h2><p>Daily expense totals from saved transactions</p></div><span className="date">{monthLabel(period)}</span></div>
-            <div className="chart-total">{money(summary?.expenses)} <small>total spent</small></div>
+            <div className="chart-total">{summary ? money(summary.expenses) : "—"} <small>total spent</small></div>
             <div className="chart">
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -187,7 +187,7 @@ export default function Dashboard() {
                     <Area dataKey="spend" stroke="#b69cff" strokeWidth={2.5} fill="url(#fill)" />
                   </AreaChart>
                 </ResponsiveContainer>
-              ) : <div className="empty-chart">{loading ? <LoaderCircle className="spin" /> : "No expenses recorded for this month yet."}</div>}
+              ) : <div className="empty-chart">{loading ? <LoaderCircle className="spin" /> : error ? "Spending data is unavailable until the API reconnects." : "No expenses recorded for this month yet."}</div>}
             </div>
           </article>
 
@@ -211,7 +211,7 @@ export default function Dashboard() {
             {(summary?.recent_transactions ?? []).length > 0 ? summary!.recent_transactions.map((item) => {
               const Icon = categoryIcon(item.category);
               return <div className="transaction" key={item.id}><div className="tx-icon"><Icon size={17} /></div><div className="tx-copy"><b>{item.title}</b><small>{item.category} · {new Date(item.transaction_date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</small></div><strong className={item.kind}>{item.kind === "income" ? "+" : "−"}{money(item.amount)}</strong></div>;
-            }) : <div className="empty-state">{loading ? "Loading transactions…" : "No transactions yet. Add your first entry to get started."}</div>}
+            }) : <div className="empty-state">{loading ? "Loading transactions…" : error ? "Transaction data is unavailable until the API reconnects." : "No transactions yet. Add your first entry to get started."}</div>}
           </article>
 
           <article className="glass panel categories" id="insights">
@@ -219,7 +219,7 @@ export default function Dashboard() {
             {(summary?.category_breakdown ?? []).length > 0 ? summary!.category_breakdown.slice(0, 5).map((item) => {
               const share = Number(summary?.expenses) > 0 ? Number(item.amount) / Number(summary?.expenses) * 100 : 0;
               return <div className="category-row" key={item.category}><div><span>{item.category}</span><b>{money(item.amount)}</b></div><div className="category-bar"><i style={{ width: `${share}%` }} /></div><small>{share.toFixed(1)}% of expenses</small></div>;
-            }) : <div className="empty-state">{loading ? "Loading categories…" : "Category insights appear after you add expenses."}</div>}
+            }) : <div className="empty-state">{loading ? "Loading categories…" : error ? "Category data is unavailable until the API reconnects." : "Category insights appear after you add expenses."}</div>}
           </article>
         </div>
 
