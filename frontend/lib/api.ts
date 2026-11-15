@@ -10,7 +10,7 @@ export async function apiRequest<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}${path}`, {
+    response = await fetch(API_BASE + path, {
       ...init,
       headers: {
         ...(init.body ? { "Content-Type": "application/json" } : {}),
@@ -31,7 +31,7 @@ export async function apiRequest<T>(
     const detail =
       payload && typeof payload.detail === "string"
         ? payload.detail
-        : `Request failed with status ${response.status}`;
+        : "Request failed with status " + response.status;
     throw new Error(detail);
   }
 
@@ -69,5 +69,12 @@ export type TransactionCreate = {
   kind: "income" | "expense";
   category: string;
   transaction_date: string;
-  note?: string;
+  note?: string | null;
 };
+
+export type TransactionRecord = TransactionCreate & {
+  id: number;
+  created_at: string;
+};
+
+export type TransactionUpdate = Partial<TransactionCreate>;
