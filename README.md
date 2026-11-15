@@ -29,12 +29,18 @@ The project is a modular monolith: a Next.js web application backed by a Python 
 | Charts / icons | Recharts, Lucide React |
 | Backend | Python, FastAPI, Pydantic, SQLAlchemy |
 | Local database | SQLite |
-| Tests | Pytest, FastAPI TestClient |
+| Tests | Pytest, FastAPI TestClient, GitHub Actions |
 | AI (planned) | Gemini API, server-side only |
 
-## Current status
+## Current implementation
 
-The initial starter contains a responsive dashboard with synthetic demo data and a FastAPI service with health, transaction CRUD and monthly summary endpoints. CSV import, authentication, multi-user persistence, Gemini integration and Goal Mode workflows are planned—not yet implemented.
+- Live dashboard reads monthly totals, daily spending, category breakdown and recent transactions from FastAPI.
+- Transactions can be created, listed with filters, edited and deleted.
+- A monthly spending budget can be created or updated manually.
+- A deterministic synthetic-data script seeds the current month with student-style income and expenses.
+- Backend tests and frontend type/lint/build checks are configured in GitHub Actions.
+
+Not yet implemented: CSV import, authentication, multi-user persistence, AI integration, forecasting and Goal Mode workflows.
 
 ## Repository layout
 
@@ -43,15 +49,15 @@ paisa-lens/
 ├── frontend/              # Next.js application
 ├── backend/               # FastAPI service
 ├── docs/                  # Product, architecture and financial rules
+├── .github/workflows/     # Automated checks
 ├── .env.example
-├── .gitignore
 └── README.md
 ```
 
 ## Run locally
 
 ### Prerequisites
-- Node.js 20.9+ and pnpm (or npm)
+- Node.js 20.9+ and npm (or pnpm)
 - Python 3.11+
 
 ### Backend
@@ -61,37 +67,59 @@ python -m venv .venv
 # Windows: .venv\Scripts\Activate.ps1
 # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
+python -m app.seed_demo_data
 uvicorn app.main:app --reload --port 8000
 ```
 API docs: http://localhost:8000/docs
+
+The seed script only inserts synthetic data when the transactions table is empty. It does not overwrite existing transactions.
 
 ### Frontend
 In a second terminal:
 ```bash
 cd frontend
 cp .env.local.example .env.local
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 Open http://localhost:3000.
 
-The dashboard currently uses synthetic demo data. Live API integration is the next implementation task.
+The `NEXT_PUBLIC_API_URL` variable should point to the FastAPI `/api/v1` base URL. For local development, the example uses `http://localhost:8000/api/v1`.
+
+## API endpoints
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET | `/api/v1/transactions` | List/filter transactions |
+| POST | `/api/v1/transactions` | Create a transaction |
+| PATCH | `/api/v1/transactions/{id}` | Edit a transaction |
+| DELETE | `/api/v1/transactions/{id}` | Delete a transaction |
+| GET | `/api/v1/dashboard/summary?year=YYYY&month=MM` | Monthly metrics |
+| GET | `/api/v1/budgets/{year}/{month}` | Read monthly budget |
+| PUT | `/api/v1/budgets/{year}/{month}` | Create/update monthly budget |
 
 ## MVP roadmap
+
 - [x] Establish project structure and product rules
-- [x] Create responsive premium dashboard shell with synthetic data
+- [x] Create responsive premium dashboard shell
 - [x] Add FastAPI health, transaction CRUD and monthly summary
-- [ ] Connect dashboard to live API data
-- [ ] Validated CSV import, column mapping and duplicate detection
-- [ ] Budget management and transaction categorisation corrections
-- [ ] Deterministic analytics, forecasts and purchase simulator
+- [x] Add monthly budgets and deterministic demo data
+- [x] Connect dashboard to live API data
+- [x] Add transaction creation and manual budget entry
+- [x] Configure automated backend/frontend checks
+- [ ] CSV import, column mapping and duplicate detection
+- [ ] Transaction editing UI and category correction workflow
+- [ ] Deterministic forecasts and purchase simulator
 - [ ] Goal Mode with no-rollover spending limits
-- [ ] Grounded AI Financial Coach with safe fallback
-- [ ] Automated tests, deployment and demo walkthrough
+- [ ] Grounded AI Financial Coach
+- [ ] Deployment and demo walkthrough
 
 ## Financial integrity and privacy
 
 Income and expense calculations are performed by the backend. Own-account transfers should not count as income or expenses when identified. Unspent allowance is not automatically saved, and goal allocations are virtual earmarks—not bank transfers. Never commit real credentials or expose Gemini keys to the browser.
+
+The current starter is a single-workspace prototype without authentication. Do not use it to store real financial records until authentication, access controls, backup and deployment security are added.
 
 PaisaLens is an educational budgeting and decision-support tool, not a bank, investment adviser, tax adviser or credit provider.
 
