@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     database_url: str = "sqlite:///./paisa_lens.db"
     frontend_origin: str = "http://localhost:3000"
+    seed_demo_data: bool = False
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
