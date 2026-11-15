@@ -196,7 +196,7 @@ export default function Dashboard() {
             <div className="ring" style={{ background: `conic-gradient(#b49aff 0 ${utilization}%, #ffffff14 ${utilization}% 100%)` }}>
               <div><b>{budgetConfigured ? `${summary?.budget_utilization ?? 0}%` : "—"}</b><small>used so far</small></div>
             </div>
-            <div className="budget-values"><span>Spent <b>{money(summary?.expenses)}</b></span><span>Limit <b>{budgetConfigured ? money(summary?.monthly_budget) : "Not set"}</b></span></div>
+            <div className="budget-values"><span>Spent <b>{summary ? money(summary.expenses) : "—"}</b></span><span>Limit <b>{!summary ? "—" : budgetConfigured ? money(summary.monthly_budget) : "Not set"}</b></span></div>
             <div className="progress"><i style={{ width: `${utilization}%` }} /></div>
             <p className={budgetConfigured && Number(summary?.budget_remaining) < 0 ? "warning-text" : "success"}>
               {budgetConfigured ? (Number(summary?.budget_remaining) < 0 ? "● You are over your monthly limit." : "● You're within your monthly budget.") : "● A budget helps measure your spending pace."}
