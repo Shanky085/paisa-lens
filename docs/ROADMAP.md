@@ -15,8 +15,9 @@
 - [x] Add deterministic synthetic student demo data
 - [x] Add monthly totals, daily spending and category breakdown API data
 - [ ] Add transaction edit/delete controls to the dashboard UI
-- [ ] Implement CSV column mapping, import preview and row validation
+- [ ] Implement statement CSV/Excel column mapping, preview and validation
 - [ ] Add duplicate detection and own-account transfer handling
+- [x] Explicitly exclude direct UPI sync without a suitable public official read-only API
 
 ## Sprint 2 — Decision support
 - [x] Monthly spending overview and category totals
@@ -47,3 +48,6 @@
 - [ ] Backup/restore and retention policy
 - [ ] Rate limiting, secure headers and operational monitoring
 - [ ] Security review and privacy notice
+
+## Reconsider only if the ecosystem changes
+Direct UPI sync may be researched again only if an official documented public read-only API becomes available for independent third-party apps without restricted participant status or a private partnership.
