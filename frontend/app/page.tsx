@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, Bell, BookOpen, CalendarDays,
+  Activity, ArrowDownRight, ArrowUpRight, Bell, BookOpen,
   CheckCircle2, CircleAlert, Coffee, Home, LayoutDashboard, LoaderCircle,
   PiggyBank, Plus, Settings2, Sparkles, Target, Wallet, X,
 } from "lucide-react";
