@@ -86,6 +86,10 @@ Open http://localhost:3000.
 
 The `NEXT_PUBLIC_API_URL` variable should point to the FastAPI `/api/v1` base URL. For local development, the example uses `http://localhost:8000/api/v1`.
 
+## Deployment preparation
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and containerized backend deployment setup. The backend can optionally seed synthetic transactions on first startup with `SEED_DEMO_DATA=true`; keep this enabled only for a disposable public demo. The current app has no authentication or per-user data isolation, so never connect real financial accounts or import real personal statements into a public deployment.
+
 ## API endpoints
 
 | Method | Path | Purpose |
