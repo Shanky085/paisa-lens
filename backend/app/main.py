@@ -13,6 +13,9 @@ from app.db.session import engine
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    if settings.seed_demo_data:
+        from app.seed_demo_data import seed_demo_data
+        seed_demo_data()
     yield
 
 
