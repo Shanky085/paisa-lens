@@ -30,7 +30,7 @@ The frontend calls the backend over JSON. The backend owns validation, persisten
 | GET | `/api/v1/dashboard/summary` | Period totals, budget, daily/category aggregates and recent records | Implemented |
 | GET | `/api/v1/budgets/{year}/{month}` | Read monthly budget | Implemented |
 | PUT | `/api/v1/budgets/{year}/{month}` | Create/update monthly budget | Implemented |
-| POST | `/api/v1/transactions/import` | Validated CSV import | Planned |
+| POST | `/api/v1/transactions/import` | Validated statement import | Planned |
 | POST | `/api/v1/simulator/purchase` | Purchase impact | Planned |
 | POST | `/api/v1/ai/insights` | Grounded AI insights | Planned |
 | POST | `/api/v1/ai/chat` | Finance assistant | Planned |
@@ -42,6 +42,16 @@ The frontend calls the backend over JSON. The backend owns validation, persisten
 - `MonthlyBudget`: one budget amount per calendar year/month, unique on `(year, month)`.
 
 Currency input is validated through Pydantic Decimal fields and stored in SQLAlchemy Numeric columns. The API serializes monetary totals as decimal strings.
+
+## Transaction ingestion
+
+Current and planned intake paths are user-initiated:
+- Manual transaction entry.
+- Importing CSV or supported statement files downloaded by the user from their bank or payment app.
+
+Direct UPI synchronisation is deliberately excluded. No public read-only UPI transaction-history API suitable for this independent application has been verified. PaisaLens will not read notification/SMS content or use unofficial endpoints. Reconsider only when an official, documented, publicly accessible read-only integration is available on clear terms.
+
+Imported records must be staged, validated and deduplicated before they affect financial totals. Source metadata should be retained so users can trace and correct imported entries.
 
 ## Persistence
 
@@ -61,5 +71,5 @@ SQLite is the local development default. `Base.metadata.create_all` creates miss
 - Configure one explicit CORS origin for the deployed frontend.
 - Authentication, user isolation, request rate limiting and account-level access control are not implemented.
 - Do not import or store real user financial records in a public deployment.
-- Validate file size, MIME type, encoding and row count before future CSV parsing.
+- Validate file size, MIME type, encoding and row count before future statement parsing.
 - Do not log raw financial transaction content or credentials.
