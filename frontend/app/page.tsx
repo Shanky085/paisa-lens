@@ -57,6 +57,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState<"transaction" | "budget" | null>(null);
   const [notice, setNotice] = useState("");
+  const localToday = new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -153,7 +154,7 @@ export default function Dashboard() {
       <section className="main">
         <header className="topbar">
           <span>Workspace / <b>Overview</b></span>
-          <div><span className="demo">● API CONNECTED</span><Bell size={18} /><span className="date">{monthLabel(period)}</span></div>
+          <div><span className="demo">● {summary ? "API CONNECTED" : loading ? "CONNECTING" : "API OFFLINE"}</span><Bell size={18} /><span className="date">{monthLabel(period)}</span></div>
         </header>
 
         <section className="welcome">
@@ -240,7 +241,7 @@ export default function Dashboard() {
               </div>
               <div className="form-grid">
                 <label className="field">Category<select name="category"><option>Food & dining</option><option>Education</option><option>Transport</option><option>Essentials</option><option>Shopping</option><option>Entertainment</option><option>Allowance</option><option>Stipend</option><option>Other</option></select></label>
-                <label className="field">Date<input name="transaction_date" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} /></label>
+                <label className="field">Date<input name="transaction_date" type="date" required defaultValue={localToday} /></label>
               </div>
               <label className="field">Note (optional)<input name="note" maxLength={500} placeholder="Add a short note" /></label>
               <button className="submit-button" disabled={saving}>{saving ? <LoaderCircle className="spin" size={16} /> : <Plus size={16} />} Save transaction</button>
