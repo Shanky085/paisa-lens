@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import {
-  Activity, ArrowDownRight, ArrowLeft, ArrowUpRight, CalendarDays,
-  CheckCircle2, CircleAlert, Filter, LayoutDashboard, LoaderCircle,
-  Pencil, Search, Sparkles, Target, Trash2, Wallet, X,
+  Activity, ArrowLeft, CalendarDays, CheckCircle2, CircleAlert, Filter,
+  LayoutDashboard, LoaderCircle, Pencil, Search, Sparkles, Target, Trash2,
+  Wallet, X,
 } from "lucide-react";
 import { apiRequest, type TransactionCreate } from "@/lib/api";
 
@@ -169,14 +170,14 @@ export default function TransactionsPage() {
   return (
     <main className="shell">
       <aside className="sidebar">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <span className="brand-icon"><Activity /></span>Paisa<span>Lens</span>
-        </a>
+        </Link>
         <p className="nav-caption">WORKSPACE</p>
-        <a className="nav" href="/"><LayoutDashboard /> Overview</a>
-        <a className="nav active" href="/transactions"><Wallet /> Transactions</a>
-        <a className="nav" href="/#goal-mode"><Target /> Goal mode</a>
-        <a className="nav" href="/#insights"><Sparkles /> AI insights</a>
+        <Link className="nav" href="/"><LayoutDashboard /> Overview</Link>
+        <Link className="nav active" href="/transactions"><Wallet /> Transactions</Link>
+        <Link className="nav" href="/#goal-mode"><Target /> Goal mode</Link>
+        <Link className="nav" href="/#insights"><Sparkles /> AI insights</Link>
         <div className="side-note">
           <Sparkles />
           <b>Know where it goes.</b>
@@ -200,7 +201,7 @@ export default function TransactionsPage() {
             <h1>Transaction <em>history.</em></h1>
             <p>Search, review and correct the activity behind your financial snapshot.</p>
           </div>
-          <a className="back-link" href="/"><ArrowLeft size={16} /> Back to overview</a>
+          <Link className="back-link" href="/"><ArrowLeft size={16} /> Back to overview</Link>
         </section>
 
         {notice && (
