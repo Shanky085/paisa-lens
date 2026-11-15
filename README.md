@@ -15,10 +15,19 @@ The project is a modular monolith: a Next.js web application backed by a Python 
 
 - INR-first, designed around student cash flow: allowance, scholarships, stipends and part-time income.
 - Privacy-first: no UPI PINs, OTPs, bank passwords, Aadhaar or PAN collection.
-- CSV-led imports; no direct bank or UPI account connection in the MVP.
+- User-initiated statement imports and manual transaction entry; no direct bank or UPI account connection in the MVP.
+- No SMS reading, payment-app notification access or unofficial transaction endpoints.
 - Distinguish unspent money, money actually saved, and money earmarked for a goal.
 - No daily allowance rollover in Goal Mode. Unused allowance does not silently become savings or increase a later day's allowance.
 - AI insights must be grounded in backend-calculated metrics and disclose uncertainty.
+
+## UPI integration decision
+
+Direct UPI synchronisation is deliberately **not part of PaisaLens**. No suitable official, publicly accessible, read-only UPI transaction-history API has been verified for an independent application. NPCI MyUPI is a consumer-facing activity service; it is not being treated as a developer API.
+
+Users can still import supported statement files downloaded from their bank or payment apps. This is a manual, user-initiated import—not an automatic connection.
+
+We will reconsider direct integration only if an official, documented public read-only API becomes available to independent applications on clear terms.
 
 ## Stack
 
@@ -40,7 +49,7 @@ The project is a modular monolith: a Next.js web application backed by a Python 
 - A deterministic synthetic-data script seeds the current month with student-style income and expenses.
 - Backend tests and frontend type/lint/build checks are configured in GitHub Actions.
 
-Not yet implemented: CSV import, authentication, multi-user persistence, AI integration, forecasting and Goal Mode workflows.
+Not yet implemented: statement import, authentication, multi-user persistence, AI integration, forecasting and Goal Mode workflows.
 
 ## Repository layout
 
@@ -64,7 +73,7 @@ paisa-lens/
 ```bash
 cd backend
 python -m venv .venv
-# Windows: .venv\Scripts\Activate.ps1
+# Windows: .venv\\Scripts\\Activate.ps1
 # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
 python -m app.seed_demo_data
@@ -112,7 +121,7 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and contain
 - [x] Connect dashboard to live API data
 - [x] Add transaction creation and manual budget entry
 - [x] Configure automated backend/frontend checks
-- [ ] CSV import, column mapping and duplicate detection
+- [ ] Statement import, column mapping and duplicate detection
 - [ ] Transaction editing UI and category correction workflow
 - [ ] Deterministic forecasts and purchase simulator
 - [ ] Goal Mode with no-rollover spending limits
@@ -121,7 +130,7 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and contain
 
 ## Financial integrity and privacy
 
-Income and expense calculations are performed by the backend. Own-account transfers should not count as income or expenses when identified. Unspent allowance is not automatically saved, and goal allocations are virtual earmarks—not bank transfers. Never commit real credentials or expose Gemini keys to the browser.
+Income and expense calculations are performed by the backend. Own-account transfers should not be counted as income or expenses when identified. Unspent allowance is not automatically saved, and goal allocations are virtual earmarks—not bank transfers. Never commit real credentials or expose Gemini keys to the browser.
 
 The current starter is a single-workspace prototype without authentication. Do not use it to store real financial records until authentication, access controls, backup and deployment security are added.
 
