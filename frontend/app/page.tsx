@@ -142,7 +142,7 @@ export default function Dashboard() {
         <div className="brand"><span className="brand-icon"><Activity /></span>Paisa<span>Lens</span></div>
         <p className="nav-caption">WORKSPACE</p>
         <a className="nav active" href="#"><LayoutDashboard /> Overview</a>
-        <a className="nav" href="#transactions"><Wallet /> Transactions</a>
+        <a className="nav" href="/transactions"><Wallet /> Transactions</a>
         <a className="nav" href="#goal-mode"><Target /> Goal mode</a>
         <a className="nav" href="#insights"><Sparkles /> AI insights</a>
         <p className="nav-caption">PREFERENCES</p>
