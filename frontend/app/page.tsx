@@ -158,7 +158,7 @@ export default function Dashboard() {
         </header>
 
         <section className="welcome">
-          <div><small className="eyebrow">YOUR FINANCIAL SNAPSHOT</small><h1>Your money, <em>in focus.</em></h1><p>Here's what's happening with your finances this month.</p></div>
+          <div><small className="eyebrow">YOUR FINANCIAL SNAPSHOT</small><h1>Your money, <em>in focus.</em></h1><p>Here&apos;s what is happening with your finances this month.</p></div>
           <button onClick={() => { setError(""); setDialog("transaction"); }}><Plus size={17} /> Add transaction</button>
         </section>
 
