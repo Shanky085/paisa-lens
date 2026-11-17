@@ -78,6 +78,11 @@ Invoke-Checked "Run frontend lint" {
     try { npm run lint } finally { Pop-Location }
 }
 
+Invoke-Checked "Build frontend for production" {
+    Push-Location $frontend
+    try { npm run build } finally { Pop-Location }
+}
+
 Write-Host ""
 Write-Host "Setup complete." -ForegroundColor Green
 Write-Host "Start the backend in Terminal 1:"
