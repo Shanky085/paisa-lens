@@ -468,6 +468,13 @@ export default function ImportPage() {
         </div>
       </aside>
 
+      <nav className="mobile-nav" aria-label="Primary navigation">
+        <Link href="/"><LayoutDashboard /><span>Overview</span></Link>
+        <Link href="/transactions"><Wallet /><span>Transactions</span></Link>
+        <Link className="active" href="/import" aria-current="page"><FileSpreadsheet /><span>Import</span></Link>
+        <Link href="/#goal-mode"><Target /><span>Goals</span></Link>
+      </nav>
+
       <section className="main transactions-main">
         <header className="topbar">
           <span>Workspace / <b>Import statement</b></span>
