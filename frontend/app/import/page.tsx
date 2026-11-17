@@ -495,6 +495,7 @@ export default function ImportPage() {
               <b>Choose a bank or UPI statement CSV</b>
               <small>Nothing is uploaded at this stage. The browser reads the file for preview.</small>
               <span className="upload-button"><FileUp size={15} /> Select CSV file</span>
+              <span className="sample-file-link">Or <Link href="/samples/sample-student-statement.csv" download>download a synthetic sample CSV</Link> to try the importer.</span>
             </label>
           ) : (
             <div className="selected-file">
