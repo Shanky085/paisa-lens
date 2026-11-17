@@ -48,7 +48,7 @@ if (-not (Test-Path $pythonEnv)) {
 
 Invoke-Checked "Install backend dependencies" {
     & $pythonEnv -m pip install --upgrade pip
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    if ($LASTEXITCODE -ne 0) { throw "pip upgrade failed with exit code $LASTEXITCODE." }
     Push-Location $backend
     try { & $pythonEnv -m pip install -e ".[dev]" } finally { Pop-Location }
 }
