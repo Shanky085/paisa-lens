@@ -41,6 +41,14 @@ git pull --ff-only
 
 If the repository is already on this computer, open its folder and run git pull --ff-only instead of cloning again.
 
+For a Windows PC, once the base tools are installed, you can run the project setup script from the repository root:
+
+~~~powershell
+.\scripts\setup-windows.ps1
+~~~
+
+It creates the Python virtual environment, installs dependencies, runs backend tests, checks TypeScript and lint, and performs a production build. It does not install packages globally. If the library computer blocks PowerShell scripts, use the manual commands below and do not change machine-wide execution policy.
+
 ## 3. Install backend dependencies
 
 Run these commands from the repository root:
