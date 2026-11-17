@@ -7,7 +7,7 @@ This guide prepares a local development environment. It does not deploy the app.
 Recommended versions for this repository:
 
 - **Git** — needed to clone and pull the repository.
-- **Node.js 24 LTS** — runs the Next.js frontend.
+- **Node.js 24 LTS or 26 LTS** — runs the Next.js frontend. Both are supported by the local setup script.
 - **Python 3.12** — runs the FastAPI backend and matches the backend CI runtime.
 
 Download from the official sites:
@@ -27,7 +27,7 @@ npm --version
 py --version
 ~~~
 
-Node should report v24.x; Python should report 3.12.x (or another supported Python 3.11+ version). The GitHub Actions workflow uses Node 24 and Python 3.12.
+Node should report v24.x or v26.x; Python should report 3.12.x (or another supported Python 3.11+ version). The repository defaults to Node 24 through `.nvmrc`; CI checks both Node 24 and 26, using Python 3.12 for the backend.
 
 ## 2. Get the repository
 
