@@ -278,3 +278,7 @@ footer{text-align:center;color:#686579;font-size:9px;letter-spacing:1.3px;paddin
   .import-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .preview-toolbar{align-items:flex-start;flex-direction:column}
 }
+
+.sample-file-link{font-size:10px;color:var(--muted)}
+.sample-file-link a{color:#c7b5ff;text-decoration:underline;text-underline-offset:3px}
+.sample-file-link a:hover{color:#eee5ff}
