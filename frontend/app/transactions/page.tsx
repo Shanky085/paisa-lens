@@ -190,6 +190,13 @@ export default function TransactionsPage() {
         </div>
       </aside>
 
+      <nav className="mobile-nav" aria-label="Primary navigation">
+        <Link href="/"><LayoutDashboard /><span>Overview</span></Link>
+        <Link className="active" href="/transactions" aria-current="page"><Wallet /><span>Transactions</span></Link>
+        <Link href="/import"><FileSpreadsheet /><span>Import</span></Link>
+        <Link href="/#goal-mode"><Target /><span>Goals</span></Link>
+      </nav>
+
       <section className="main transactions-main">
         <header className="topbar">
           <span>Workspace / <b>Transactions</b></span>
