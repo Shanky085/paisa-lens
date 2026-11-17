@@ -3,10 +3,9 @@
 import { useMemo, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import {
-  Activity, ArrowDownLeft, ArrowLeft, ArrowRight, CheckCircle2,
-  CircleAlert, FileSpreadsheet, FileUp, Info, LayoutDashboard,
-  LoaderCircle, Search, ShieldCheck, Sparkles, Target, UploadCloud,
-  Wallet, X,
+  Activity, ArrowLeft, ArrowRight, CheckCircle2, CircleAlert,
+  FileSpreadsheet, FileUp, Info, LayoutDashboard, LoaderCircle,
+  ShieldCheck, Sparkles, Target, UploadCloud, Wallet, X,
 } from "lucide-react";
 import {
   apiRequest,
