@@ -57,13 +57,20 @@ Invoke-Checked "Install backend dependencies" {
 # native DLLs through Application Control, so fall back to SQLAlchemy's
 # supported pure-Python installation when its native import is blocked.
 Write-Host ""
+Write-Host ""
 Write-Host "==> Check SQLAlchemy native extension availability" -ForegroundColor Cyan
 $sqlalchemyProbe = & $pythonEnv -c "import subprocess,sys; p=subprocess.run([sys.executable,'-c','import sqlalchemy; from sqlalchemy.engine import result'],capture_output=True,text=True); print('EXIT_CODE='+str(p.returncode)); print(p.stdout); print(p.stderr)"
 if ($LASTEXITCODE -ne 0) {
     throw "Could not start the isolated SQLAlchemy import check (exit code $LASTEXITCODE)."
 }
-$probeText = $sqlalchemyProbe -join "`n"
-$probeExitMatch = [regex]::Match($probeText, '(?m)^EXIT_CODE=(d+)    if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
+$probeText = $sqlalchemyProbe -join [Environment]::NewLine
+$probeExitLine = $sqlalchemyProbe | Where-Object { $_ -like "EXIT_CODE=*" } | Select-Object -First 1
+if (-not $probeExitLine) {
+    throw "The SQLAlchemy import check returned an unexpected result: $probeText"
+}
+$sqlalchemyProbeExitCode = [int]$probeExitLine.Substring("EXIT_CODE=".Length)
+if ($sqlalchemyProbeExitCode -ne 0) {
+    if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
         Write-Host "A Windows policy blocked SQLAlchemy's optional native extension. Installing its pure-Python build..." -ForegroundColor Yellow
         $sqlalchemyVersion = & $pythonEnv -c "from importlib.metadata import version; print(version('SQLAlchemy'))"
         if ($LASTEXITCODE -ne 0 -or -not $sqlalchemyVersion) {
