@@ -50,7 +50,7 @@ const FIELD_LABELS: { key: FieldKey; label: string }[] = [
 ];
 
 const TRANSFER_PATTERN =
-  /\b\b(self\\s*transfer|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
+  /\b(self\s*transfer|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
 
 function parseCsv(source: string): string[][] {
   const input = source.replace(/^\uFEFF/, "");
