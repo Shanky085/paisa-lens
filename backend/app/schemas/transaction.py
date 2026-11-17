@@ -35,3 +35,15 @@ class TransactionRead(TransactionCreate):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class TransactionImportRequest(BaseModel):
+    transactions: list[TransactionCreate] = Field(min_length=1, max_length=1000)
+    allow_duplicates: bool = False
+
+
+class TransactionImportResult(BaseModel):
+    imported_count: int
+    duplicate_count: int
+    duplicate_rows: list[int]
+    requires_confirmation: bool
