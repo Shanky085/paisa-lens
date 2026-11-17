@@ -1,7 +1,9 @@
+from calendar import monthrange
 from datetime import date
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -103,6 +105,108 @@ def import_transactions(
         duplicate_count=len(duplicate_rows),
         duplicate_rows=duplicate_rows,
         requires_confirmation=False,
+    )
+
+
+FORMULA_TRIGGERS = ("=", "+", "-", "@", "\t", "\r", "\n")
+
+
+def sanitize_csv_cell(value: object | None) -> str:
+    """
+    Prevents CSV formula injection / macro execution.
+    Checks raw and leading-whitespace-stripped text for formula triggers (=, +, -, @, tab, newline).
+    Neutralizes formula triggers by prepending a single quote.
+    Escapes embedded double quotes per RFC 4180.
+    """
+    if value is None:
+        return '""'
+    text = str(value)
+    stripped = text.lstrip(" \t\r\n")
+    is_formula = False
+    if stripped and stripped[0] in FORMULA_TRIGGERS:
+        is_formula = True
+    elif text and text[0] in FORMULA_TRIGGERS:
+        is_formula = True
+
+    escaped = text.replace('"', '""')
+    if is_formula:
+        return f'"\'{escaped}"'
+    return f'"{escaped}"'
+
+
+@router.get("/export")
+def export_transactions(
+    start_date: date | None = None,
+    end_date: date | None = None,
+    all_time: bool = Query(default=False),
+    kind: str | None = Query(default=None, pattern="^(income|expense)$"),
+    category: str | None = Query(default=None, min_length=1, max_length=60),
+    db: Session = Depends(get_db),
+):
+    if all_time and (start_date is not None or end_date is not None):
+        raise HTTPException(
+            status_code=422,
+            detail="Cannot specify date filters when all_time is True.",
+        )
+
+    if (start_date is None) != (end_date is None):
+        raise HTTPException(
+            status_code=422,
+            detail="Both start_date and end_date must be provided together.",
+        )
+
+    if start_date and end_date and start_date > end_date:
+        raise HTTPException(
+            status_code=422,
+            detail="start_date must be on or before end_date.",
+        )
+
+    today = date.today()
+    if not all_time and start_date is None and end_date is None:
+        filter_start = date(today.year, today.month, 1)
+        filter_end = date(today.year, today.month, monthrange(today.year, today.month)[1])
+    else:
+        filter_start = start_date
+        filter_end = end_date
+
+    statement = select(Transaction)
+    if not all_time:
+        assert filter_start is not None and filter_end is not None
+        statement = statement.where(
+            Transaction.transaction_date >= filter_start,
+            Transaction.transaction_date <= filter_end,
+        )
+    if kind:
+        statement = statement.where(Transaction.kind == kind)
+    if category:
+        statement = statement.where(Transaction.category == category)
+
+    statement = statement.order_by(
+        Transaction.transaction_date.desc(), Transaction.id.desc()
+    )
+
+    def generate_csv():
+        yield "Date,Type,Title,Category,Amount,Note\r\n"
+        for item in db.scalars(statement.execution_options(yield_per=100)):
+            amount_str = f"{Decimal(str(item.amount)):.2f}"
+            row = [
+                item.transaction_date.isoformat(),
+                item.kind,
+                sanitize_csv_cell(item.title),
+                sanitize_csv_cell(item.category),
+                amount_str,
+                sanitize_csv_cell(item.note),
+            ]
+            yield f"{row[0]},{row[1]},{row[2]},{row[3]},{row[4]},{row[5]}\r\n"
+
+    filename = f"paisalens-transactions-{today.isoformat()}.csv"
+    return StreamingResponse(
+        generate_csv(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache",
+        },
     )
 
 
