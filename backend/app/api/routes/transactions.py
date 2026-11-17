@@ -1,11 +1,19 @@
 from datetime import date
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.transaction import Transaction
-from app.schemas.transaction import TransactionCreate, TransactionRead, TransactionUpdate
+from app.schemas.transaction import (
+    TransactionCreate,
+    TransactionImportRequest,
+    TransactionImportResult,
+    TransactionRead,
+    TransactionUpdate,
+)
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -46,6 +54,56 @@ def create_transaction(payload: TransactionCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(item)
     return item
+
+
+def _transaction_signature(item):
+    """Conservative duplicate candidate: date, amount, kind and normalized title."""
+    return (
+        item.transaction_date,
+        Decimal(item.amount).quantize(Decimal("0.01")),
+        item.kind,
+        " ".join(item.title.casefold().split()),
+    )
+
+
+@router.post("/import", response_model=TransactionImportResult)
+def import_transactions(
+    payload: TransactionImportRequest,
+    db: Session = Depends(get_db),
+):
+    dates = [item.transaction_date for item in payload.transactions]
+    existing_statement = select(Transaction).where(
+        Transaction.transaction_date >= min(dates),
+        Transaction.transaction_date <= max(dates),
+    )
+    existing = db.scalars(existing_statement).all()
+    known_signatures = {_transaction_signature(item) for item in existing}
+
+    duplicate_rows = []
+    batch_signatures = set()
+    for row_number, item in enumerate(payload.transactions, start=1):
+        signature = _transaction_signature(item)
+        if signature in known_signatures or signature in batch_signatures:
+            duplicate_rows.append(row_number)
+        batch_signatures.add(signature)
+
+    if duplicate_rows and not payload.allow_duplicates:
+        return TransactionImportResult(
+            imported_count=0,
+            duplicate_count=len(duplicate_rows),
+            duplicate_rows=duplicate_rows,
+            requires_confirmation=True,
+        )
+
+    records = [Transaction(**item.model_dump()) for item in payload.transactions]
+    db.add_all(records)
+    db.commit()
+    return TransactionImportResult(
+        imported_count=len(records),
+        duplicate_count=len(duplicate_rows),
+        duplicate_rows=duplicate_rows,
+        requires_confirmation=False,
+    )
 
 
 @router.patch("/{transaction_id}", response_model=TransactionRead)
