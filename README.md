@@ -110,6 +110,7 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and contain
 | GET | `/health` | Health check |
 | GET | `/api/v1/transactions` | List/filter transactions |
 | POST | `/api/v1/transactions` | Create a transaction |
+| POST | `/api/v1/transactions/import` | Review-gated bulk transaction import |
 | PATCH | `/api/v1/transactions/{id}` | Edit a transaction |
 | DELETE | `/api/v1/transactions/{id}` | Delete a transaction |
 | GET | `/api/v1/dashboard/summary?year=YYYY&month=MM` | Monthly metrics |
