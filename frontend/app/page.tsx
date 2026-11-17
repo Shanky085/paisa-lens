@@ -152,6 +152,13 @@ export default function Dashboard() {
         <div className="profile"><div className="avatar">S</div><div><b>Student account</b><small>Local demo workspace</small></div></div>
       </aside>
 
+      <nav className="mobile-nav" aria-label="Primary navigation">
+        <a className="active" href="/" aria-current="page"><LayoutDashboard /><span>Overview</span></a>
+        <a href="/transactions"><Wallet /><span>Transactions</span></a>
+        <a href="/import"><FileSpreadsheet /><span>Import</span></a>
+        <a href="/#goal-mode"><Target /><span>Goals</span></a>
+      </nav>
+
       <section className="main">
         <header className="topbar">
           <span>Workspace / <b>Overview</b></span>
