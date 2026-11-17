@@ -76,7 +76,7 @@ Open a **second terminal** at the repository root:
 
 ~~~powershell
 cd frontend
-Copy-Item .env.local.example .env.local
+if (-not (Test-Path .env.local)) { Copy-Item .env.local.example .env.local }
 npm install
 npm run typecheck
 npm run lint
