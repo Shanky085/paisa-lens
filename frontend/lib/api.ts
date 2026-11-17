@@ -78,3 +78,16 @@ export type TransactionRecord = TransactionCreate & {
 };
 
 export type TransactionUpdate = Partial<TransactionCreate>;
+
+
+export type TransactionImportRequest = {
+  transactions: TransactionCreate[];
+  allow_duplicates?: boolean;
+};
+
+export type TransactionImportResult = {
+  imported_count: number;
+  duplicate_count: number;
+  duplicate_rows: number[];
+  requires_confirmation: boolean;
+};
