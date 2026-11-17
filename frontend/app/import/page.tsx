@@ -50,7 +50,7 @@ const FIELD_LABELS: { key: FieldKey; label: string }[] = [
 ];
 
 const TRANSFER_PATTERN =
-  /\b(self\s*transfer|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
+  /\b(self\s*transfer|self\s*a\/?c|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
 
 function parseCsv(source: string): string[][] {
   const input = source.replace(/^\uFEFF/, "");
@@ -111,7 +111,7 @@ function detectColumn(headers: string[], patterns: RegExp[]): string {
 
 function detectMapping(headers: string[]): CsvMapping {
   return {
-    date: detectColumn(headers, [/^date$/, /transaction date/, /txn date/, /value date/]),
+    date: detectColumn(headers, [/^date\b/, /transaction date/, /txn date/, /value date/]),
     title: detectColumn(headers, [/description/, /narration/, /particulars/, /transaction details/, /^details$/, /^remarks$/]),
     amount: detectColumn(headers, [/^amount$/, /txn amount/, /transaction amount/]),
     kind: detectColumn(headers, [/transaction type/, /^type$/, /^dr\/cr$/, /^cr\/dr$/, /debit.?credit/]),
@@ -173,6 +173,7 @@ function parseAmount(raw: string): number | null {
     .replace(/₹|INR|Rs\.?/gi, "")
     .replace(/,/g, "")
     .replace(/\s/g, "")
+    .replace(/(?:DR|CR|DEBIT|CREDIT)\.?$/i, "")
     .replace(/[()]/g, "");
   const parsed = Number(normalized);
   if (!Number.isFinite(parsed)) return null;
@@ -184,6 +185,11 @@ function parseKind(raw: string): "income" | "expense" | null {
   if (/^(income|credit|cr|deposit|received|inflow|refund)$/.test(value)) return "income";
   if (/^(expense|debit|dr|withdrawal|paid|outflow|payment)$/.test(value)) return "expense";
   return null;
+}
+
+function amountSuffixKind(raw: string): "income" | "expense" | null {
+  const suffix = raw.trim().match(/\\b(DR|DEBIT|CR|CREDIT)\\.?\\s*$/i)?.[1] ?? "";
+  return suffix ? parseKind(suffix) : null;
 }
 
 function signatureOf(item: TransactionCreate): string {
@@ -238,7 +244,7 @@ function buildPreview(
       const parsed = parseAmount(value("amount"));
       if (parsed !== null) {
         amount = Math.abs(parsed);
-        const explicitKind = value("kind") ? parseKind(value("kind")) : null;
+        const explicitKind = value("kind") ? parseKind(value("kind")) : amountSuffixKind(value("amount"));
         if (value("kind") && explicitKind === null) {
           return { line: record.line, transaction: null, error: "Transaction type is not recognised. Use income/credit/CR or expense/debit/DR.", suspectedTransfer: false, duplicateInFile: false };
         }
