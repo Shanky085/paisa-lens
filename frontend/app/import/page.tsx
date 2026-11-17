@@ -188,7 +188,7 @@ function parseKind(raw: string): "income" | "expense" | null {
 }
 
 function amountSuffixKind(raw: string): "income" | "expense" | null {
-  const suffix = raw.trim().match(/\\b(DR|DEBIT|CR|CREDIT)\\.?\\s*$/i)?.[1] ?? "";
+  const suffix = raw.trim().match(/\b(DR|DEBIT|CR|CREDIT)\.?\s*$/i)?.[1] ?? "";
   return suffix ? parseKind(suffix) : null;
 }
 
