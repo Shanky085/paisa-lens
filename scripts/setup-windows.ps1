@@ -58,10 +58,86 @@ Invoke-Checked "Install backend dependencies" {
 # supported pure-Python installation when its native import is blocked.
 Write-Host ""
 Write-Host "==> Check SQLAlchemy native extension availability" -ForegroundColor Cyan
-$sqlalchemyProbe = & $pythonEnv -c "import sqlalchemy; from sqlalchemy.engine import result; print(sqlalchemy.__version__)" 2>&1
-$sqlalchemyProbeExitCode = $LASTEXITCODE
+$sqlalchemyProbe = & $pythonEnv -c "import subprocess,sys; p=subprocess.run([sys.executable,'-c','import sqlalchemy; from sqlalchemy.engine import result'],capture_output=True,text=True); print('EXIT_CODE='+str(p.returncode)); print(p.stdout); print(p.stderr)"
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not start the isolated SQLAlchemy import check (exit code $LASTEXITCODE)."
+}
+$probeText = $sqlalchemyProbe -join "`n"
+$probeExitMatch = [regex]::Match($probeText, '(?m)^EXIT_CODE=(d+)    if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
+        Write-Host "A Windows policy blocked SQLAlchemy's optional native extension. Installing its pure-Python build..." -ForegroundColor Yellow
+        $sqlalchemyVersion = & $pythonEnv -c "from importlib.metadata import version; print(version('SQLAlchemy'))"
+        if ($LASTEXITCODE -ne 0 -or -not $sqlalchemyVersion) {
+            throw "Could not determine the installed SQLAlchemy version for a safe pure-Python reinstall."
+        }
+        $env:DISABLE_SQLALCHEMY_CEXT = "1"
+        try {
+            Invoke-Checked "Reinstall SQLAlchemy $sqlalchemyVersion without native extensions" {
+                & $pythonEnv -m pip install --force-reinstall --no-cache-dir --no-binary=SQLAlchemy --no-deps "SQLAlchemy==$sqlalchemyVersion"
+            }
+        }
+        finally {
+            Remove-Item Env:DISABLE_SQLALCHEMY_CEXT -ErrorAction SilentlyContinue
+        }
+        Invoke-Checked "Verify SQLAlchemy pure-Python installation" {
+            & $pythonEnv -c "import sqlalchemy; from sqlalchemy.engine import result; print('SQLAlchemy', sqlalchemy.__version__, 'loaded successfully')"
+        }
+    }
+    else {
+        throw "SQLAlchemy import check failed for an unexpected reason: $probeText"
+    }
+}
+else {
+    Write-Host "SQLAlchemy imported successfully."
+}
+
+if (-not (Test-Path (Join-Path $frontend ".env.local"))) {
+    Copy-Item (Join-Path $frontend ".env.local.example") (Join-Path $frontend ".env.local")
+    Write-Host "Created frontend/.env.local from the example."
+}
+
+Invoke-Checked "Install frontend dependencies" {
+    Push-Location $frontend
+    try { npm install } finally { Pop-Location }
+}
+
+Invoke-Checked "Run backend tests" {
+    Push-Location $backend
+    try { & $pythonEnv -m pytest -q } finally { Pop-Location }
+}
+
+Invoke-Checked "Run frontend type-check" {
+    Push-Location $frontend
+    try { npm run typecheck } finally { Pop-Location }
+}
+
+Invoke-Checked "Run frontend lint" {
+    Push-Location $frontend
+    try { npm run lint } finally { Pop-Location }
+}
+
+Invoke-Checked "Build frontend for production" {
+    Push-Location $frontend
+    try { npm run build } finally { Pop-Location }
+}
+
+Write-Host ""
+Write-Host "Setup complete." -ForegroundColor Green
+Write-Host "Start the backend in Terminal 1:"
+Write-Host ('  cd "' + $backend + '"')
+Write-Host '  .\.venv\Scripts\python.exe -m app.seed_demo_data'
+Write-Host '  .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000'
+Write-Host ""
+Write-Host "Start the frontend in Terminal 2:"
+Write-Host ('  cd "' + $frontend + '"')
+Write-Host '  npm run dev'
+Write-Host ""
+Write-Host "Open http://localhost:3000 (ledger: /transactions, CSV import: /import)."
+)
+if (-not $probeExitMatch.Success) {
+    throw "The SQLAlchemy import check returned an unexpected result: $probeText"
+}
+$sqlalchemyProbeExitCode = [int]$probeExitMatch.Groups[1].Value
 if ($sqlalchemyProbeExitCode -ne 0) {
-    $probeText = $sqlalchemyProbe -join "`n"
     if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
         Write-Host "A Windows policy blocked SQLAlchemy's optional native extension. Installing its pure-Python build..." -ForegroundColor Yellow
         $sqlalchemyVersion = & $pythonEnv -c "from importlib.metadata import version; print(version('SQLAlchemy'))"
