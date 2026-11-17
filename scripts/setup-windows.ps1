@@ -53,6 +53,38 @@ Invoke-Checked "Install backend dependencies" {
     try { & $pythonEnv -m pip install -e ".[dev]" } finally { Pop-Location }
 }
 
+# SQLAlchemy's Cython extensions are optional. Some managed Windows PCs block
+# native DLLs through Application Control, so fall back to SQLAlchemy's
+# supported pure-Python installation when its native import is blocked.
+Write-Host ""
+Write-Host "==> Check SQLAlchemy native extension availability" -ForegroundColor Cyan
+$sqlalchemyProbe = & $pythonEnv -c "import sqlalchemy; from sqlalchemy.engine import result; print(sqlalchemy.__version__)" 2>&1
+$sqlalchemyProbeExitCode = $LASTEXITCODE
+if ($sqlalchemyProbeExitCode -ne 0) {
+    $probeText = $sqlalchemyProbe -join "`n"
+    if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
+        Write-Host "A Windows policy blocked SQLAlchemy's optional native extension. Installing its pure-Python build..." -ForegroundColor Yellow
+        $env:DISABLE_SQLALCHEMY_CEXT = "1"
+        try {
+            Invoke-Checked "Reinstall SQLAlchemy without native extensions" {
+                & $pythonEnv -m pip install --force-reinstall --no-cache-dir --no-binary=SQLAlchemy --no-deps "SQLAlchemy>=2.0.0"
+            }
+        }
+        finally {
+            Remove-Item Env:DISABLE_SQLALCHEMY_CEXT -ErrorAction SilentlyContinue
+        }
+        Invoke-Checked "Verify SQLAlchemy pure-Python installation" {
+            & $pythonEnv -c "import sqlalchemy; from sqlalchemy.engine import result; print('SQLAlchemy', sqlalchemy.__version__, 'loaded successfully')"
+        }
+    }
+    else {
+        throw "SQLAlchemy import check failed for an unexpected reason: $probeText"
+    }
+}
+else {
+    Write-Host "SQLAlchemy imported successfully."
+}
+
 if (-not (Test-Path (Join-Path $frontend ".env.local"))) {
     Copy-Item (Join-Path $frontend ".env.local.example") (Join-Path $frontend ".env.local")
     Write-Host "Created frontend/.env.local from the example."
