@@ -46,10 +46,12 @@ We will reconsider direct integration only if an official, documented public rea
 - Live dashboard reads monthly totals, daily spending, category breakdown and recent transactions from FastAPI.
 - Transactions can be created, listed with filters, edited and deleted.
 - A monthly spending budget can be created or updated manually.
+- A transaction history page supports search, date/type/category filters, editing and deletion.
+- A browser-based CSV importer supports column mapping, row validation, preview, probable self-transfer warnings and confirmation before importing possible duplicates.
 - A deterministic synthetic-data script seeds the current month with student-style income and expenses.
 - Backend tests and frontend type/lint/build checks are configured in GitHub Actions.
 
-Not yet implemented: statement import, authentication, multi-user persistence, AI integration, forecasting and Goal Mode workflows.
+Not yet implemented: Excel statement import, authentication, multi-user persistence, AI integration, forecasting and Goal Mode workflows.
 
 ## Repository layout
 
@@ -123,7 +125,8 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and contain
 - [x] Connect dashboard to live API data
 - [x] Add transaction creation and manual budget entry
 - [x] Configure automated backend/frontend checks
-- [ ] Statement import, column mapping and duplicate detection
+- [x] CSV statement import, column mapping, validation and possible-duplicate confirmation
+- [ ] Excel statement import and broader bank-specific format handling
 - [ ] Deterministic forecasts and purchase simulator
 - [ ] Goal Mode with no-rollover spending limits
 - [ ] Grounded AI Financial Coach
