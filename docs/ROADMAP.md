@@ -15,8 +15,10 @@
 - [x] Add deterministic synthetic student demo data
 - [x] Add monthly totals, daily spending and category breakdown API data
 - [x] Add dedicated transaction history UI with search, filters, edit and delete controls
-- [ ] Implement statement CSV/Excel column mapping, preview and validation
-- [ ] Add duplicate detection and own-account transfer handling
+- [x] Implement browser-side CSV parsing, column mapping, row preview and validation
+- [x] Add review-gated bulk import with possible-duplicate confirmation
+- [x] Highlight likely own-account transfers and leave them unchecked by default
+- [ ] Add Excel import and broader bank-specific format handling
 - [x] Explicitly exclude direct UPI sync without a suitable public official read-only API
 
 ## Sprint 2 — Decision support
