@@ -70,7 +70,7 @@ paisa-lens/
 For the complete PowerShell-first setup guide, including shared-PC notes and macOS/Linux equivalents, see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
 
 ### Prerequisites
-- Node.js 24 LTS and npm
+- Node.js 24 or 26 LTS and npm (Node 24 remains the repository default)
 - Python 3.12 (Python 3.11+ is supported)
 
 ### Backend
