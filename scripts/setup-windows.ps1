@@ -64,10 +64,14 @@ if ($sqlalchemyProbeExitCode -ne 0) {
     $probeText = $sqlalchemyProbe -join "`n"
     if ($probeText -match "(?i)DLL load failed|_result_cy|Application Control") {
         Write-Host "A Windows policy blocked SQLAlchemy's optional native extension. Installing its pure-Python build..." -ForegroundColor Yellow
+        $sqlalchemyVersion = & $pythonEnv -c "from importlib.metadata import version; print(version('SQLAlchemy'))"
+        if ($LASTEXITCODE -ne 0 -or -not $sqlalchemyVersion) {
+            throw "Could not determine the installed SQLAlchemy version for a safe pure-Python reinstall."
+        }
         $env:DISABLE_SQLALCHEMY_CEXT = "1"
         try {
-            Invoke-Checked "Reinstall SQLAlchemy without native extensions" {
-                & $pythonEnv -m pip install --force-reinstall --no-cache-dir --no-binary=SQLAlchemy --no-deps "SQLAlchemy>=2.0.0"
+            Invoke-Checked "Reinstall SQLAlchemy $sqlalchemyVersion without native extensions" {
+                & $pythonEnv -m pip install --force-reinstall --no-cache-dir --no-binary=SQLAlchemy --no-deps "SQLAlchemy==$sqlalchemyVersion"
             }
         }
         finally {
