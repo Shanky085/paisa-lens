@@ -14,7 +14,7 @@
 - [x] Add monthly budget storage and manual budget entry
 - [x] Add deterministic synthetic student demo data
 - [x] Add monthly totals, daily spending and category breakdown API data
-- [ ] Add transaction edit/delete controls to the dashboard UI
+- [x] Add dedicated transaction history UI with search, filters, edit and delete controls
 - [ ] Implement statement CSV/Excel column mapping, preview and validation
 - [ ] Add duplicate detection and own-account transfer handling
 - [x] Explicitly exclude direct UPI sync without a suitable public official read-only API
@@ -37,7 +37,7 @@
 - [x] Backend API tests in GitHub Actions
 - [x] Frontend type-check, lint and build workflow
 - [x] Backend Dockerfile and deployment instructions
-- [ ] Verify latest frontend production build is green
+- [x] Verify frontend type-check, lint and production build in GitHub Actions (Node 24 LTS)
 - [ ] Provision frontend and backend hosting
 - [ ] Test deployed experience on mobile
 - [ ] Add demo screenshots and record under-five-minute walkthrough
