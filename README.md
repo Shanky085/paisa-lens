@@ -65,9 +65,11 @@ paisa-lens/
 
 ## Run locally
 
+For the complete PowerShell-first setup guide, including shared-PC notes and macOS/Linux equivalents, see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
+
 ### Prerequisites
-- Node.js 20.9+ and npm (or pnpm)
-- Python 3.11+
+- Node.js 24 LTS and npm
+- Python 3.12 (Python 3.11+ is supported)
 
 ### Backend
 ```bash
@@ -122,7 +124,6 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel frontend and contain
 - [x] Add transaction creation and manual budget entry
 - [x] Configure automated backend/frontend checks
 - [ ] Statement import, column mapping and duplicate detection
-- [ ] Transaction editing UI and category correction workflow
 - [ ] Deterministic forecasts and purchase simulator
 - [ ] Goal Mode with no-rollover spending limits
 - [ ] Grounded AI Financial Coach
