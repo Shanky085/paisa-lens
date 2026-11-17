@@ -97,7 +97,7 @@ If .env.local already exists, do not overwrite it; check that NEXT_PUBLIC_API_UR
 http://localhost:8000/api/v1
 ~~~
 
-Open http://localhost:3000. The overview is at / and the transaction ledger is at /transactions.
+Open http://localhost:3000. The overview is at /, the transaction ledger is at /transactions and the CSV importer is at /import. To test the importer without personal data, download the synthetic sample at http://localhost:3000/samples/sample-student-statement.csv.
 
 ## 5. Stop the app
 
