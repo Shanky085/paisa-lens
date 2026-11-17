@@ -50,7 +50,7 @@ const FIELD_LABELS: { key: FieldKey; label: string }[] = [
 ];
 
 const TRANSFER_PATTERN =
-  /\b(self\s*transfer|self|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
+  /\b\b(self\\s*transfer|own\s*a\/?c|own\s*account|between\s*own|transfer\s+to\s+self|internal\s+transfer)\b/i;
 
 function parseCsv(source: string): string[][] {
   const input = source.replace(/^\uFEFF/, "");
@@ -224,14 +224,14 @@ function buildPreview(
       if ((debitPresent && debit === null) || (creditPresent && credit === null)) {
         return { line: record.line, transaction: null, error: "Debit or credit amount is not numeric.", suspectedTransfer: false, duplicateInFile: false };
       }
-      if ((debit ?? 0) > 0 && (credit ?? 0) > 0) {
+      if (debit !== null && debit !== 0 && credit !== null && credit !== 0) {
         return { line: record.line, transaction: null, error: "Both debit and credit contain values; check the column mapping.", suspectedTransfer: false, duplicateInFile: false };
       }
-      if ((debit ?? 0) > 0) {
-        amount = Math.abs(debit ?? 0);
+      if (debit !== null && debit !== 0) {
+        amount = Math.abs(debit);
         kind = "expense";
-      } else if ((credit ?? 0) > 0) {
-        amount = Math.abs(credit ?? 0);
+      } else if (credit !== null && credit !== 0) {
+        amount = Math.abs(credit);
         kind = "income";
       }
     } else {
@@ -321,6 +321,7 @@ export default function ImportPage() {
   const invalidCount = previewRows.filter((row) => row.transaction === null).length;
   const transferCount = readyRows.filter((row) => row.suspectedTransfer).length;
   const duplicateCount = readyRows.filter((row) => row.duplicateInFile).length;
+  const defaultIncludedCount = readyRows.filter((row) => !row.suspectedTransfer && !row.duplicateInFile).length;
 
   const mappingReady =
     mapping.date !== "" &&
@@ -549,7 +550,7 @@ export default function ImportPage() {
 
               <div className="import-stats">
                 <div><b>{previewRows.length}</b><small>Rows read</small></div>
-                <div><b className="income">{readyRows.length - transferCount - duplicateCount}</b><small>Ready by default</small></div>
+                <div><b className="income">{defaultIncludedCount}</b><small>Ready by default</small></div>
                 <div><b className="transfer-number">{transferCount}</b><small>Possible transfers</small></div>
                 <div><b className="duplicate-number">{duplicateCount}</b><small>Repeated in file</small></div>
                 <div><b className="invalid-number">{invalidCount}</b><small>Need correction</small></div>
