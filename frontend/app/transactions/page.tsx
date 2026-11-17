@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import Link from "next/link";
 import {
   Activity, ArrowLeft, CalendarDays, CheckCircle2, CircleAlert, Filter,
-  LayoutDashboard, LoaderCircle, Pencil, Search, Sparkles, Target, Trash2,
+  FileSpreadsheet, LayoutDashboard, LoaderCircle, Pencil, Search, Sparkles, Target, Trash2,
   Wallet, X,
 } from "lucide-react";
 import { apiRequest, type TransactionCreate } from "@/lib/api";
@@ -176,6 +176,7 @@ export default function TransactionsPage() {
         <p className="nav-caption">WORKSPACE</p>
         <Link className="nav" href="/"><LayoutDashboard /> Overview</Link>
         <Link className="nav active" href="/transactions"><Wallet /> Transactions</Link>
+        <Link className="nav" href="/import"><FileSpreadsheet /> Import statement</Link>
         <Link className="nav" href="/#goal-mode"><Target /> Goal mode</Link>
         <Link className="nav" href="/#insights"><Sparkles /> AI insights</Link>
         <div className="side-note">
