@@ -32,8 +32,8 @@ if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
 }
 
 $nodeVersion = node --version
-if ($nodeVersion -notmatch '^v24\.') {
-    throw "This project setup expects Node.js 24 LTS. Detected $nodeVersion. Install Node 24 and reopen the terminal."
+if ($nodeVersion -notmatch '^v(24|26)\.') {
+    throw "PaisaLens supports Node.js 24 LTS or 26 LTS. Detected $nodeVersion. Install either supported LTS release and reopen the terminal."
 }
 
 Invoke-Checked "Verify Python 3.12" { py -3.12 --version }
