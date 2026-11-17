@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Activity, ArrowDownRight, ArrowUpRight, Bell, BookOpen,
@@ -153,10 +154,10 @@ export default function Dashboard() {
       </aside>
 
       <nav className="mobile-nav" aria-label="Primary navigation">
-        <a className="active" href="/" aria-current="page"><LayoutDashboard /><span>Overview</span></a>
-        <a href="/transactions"><Wallet /><span>Transactions</span></a>
-        <a href="/import"><FileSpreadsheet /><span>Import</span></a>
-        <a href="/#goal-mode"><Target /><span>Goals</span></a>
+        <Link className="active" href="/" aria-current="page"><LayoutDashboard /><span>Overview</span></Link>
+        <Link href="/transactions"><Wallet /><span>Transactions</span></Link>
+        <Link href="/import"><FileSpreadsheet /><span>Import</span></Link>
+        <Link href="/#goal-mode"><Target /><span>Goals</span></Link>
       </nav>
 
       <section className="main">
