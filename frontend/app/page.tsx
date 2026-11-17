@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Activity, ArrowDownRight, ArrowUpRight, Bell, BookOpen,
-  CheckCircle2, CircleAlert, Coffee, Home, LayoutDashboard, LoaderCircle,
+  CheckCircle2, CircleAlert, Coffee, FileSpreadsheet, Home, LayoutDashboard, LoaderCircle,
   PiggyBank, Plus, Settings2, Sparkles, Target, Wallet, X,
 } from "lucide-react";
 import {
@@ -143,6 +143,7 @@ export default function Dashboard() {
         <p className="nav-caption">WORKSPACE</p>
         <a className="nav active" href="#"><LayoutDashboard /> Overview</a>
         <a className="nav" href="/transactions"><Wallet /> Transactions</a>
+        <a className="nav" href="/import"><FileSpreadsheet /> Import statement</a>
         <a className="nav" href="#goal-mode"><Target /> Goal mode</a>
         <a className="nav" href="#insights"><Sparkles /> AI insights</a>
         <p className="nav-caption">PREFERENCES</p>
